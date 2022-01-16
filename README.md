@@ -1,86 +1,172 @@
-# Vue Simple Slider
+# vue-simple-slider(fork [vue-horizontal-list](https://github.com/fuxingloh/vue-horizontal-list/issues/new)]
+A pure vue horizontal list implementation with minimal dependencies, ssr support, mobile friendly, touch friendly and responsive.
+I created this because I like how AirBnb does their horizontal list, I couldn't find a library that is simple and close to it.
 
-> vue-simple-slider
+Check it out: [vue-horizontal-list demo](https://nuxt-app.now.sh/vue-horizontal-list).
 
-Vue slider component with touch and mouse support.
+[![vue-horizontal-list screenshot](demo.png)](https://nuxt-app.now.sh/vue-horizontal-list)
 
-Modern browsers and IE10+ (IE9 should work, but as flex is not supported you'll need to change CSS).
+
+## Installation
+```shell script
+yarn add https://github.com/Zerotul2015/vue-simple-slider
+```
 
 ## Features
+* Lightweight implementation with 1 dependencies.
+* SSR supported
+* Mobile touch screen friendly
+* Invisible scroll bar for consistent Windows and MacOS browsing experience.
+* Snap to the nearest item in the horizontal-list when scrolling.
+* Windowed & Full-screen mode
+    * The windowed mode will respect the container and not show overflowing item
+    * Full-screen mode will show overflowing item, best result for small screen
+* Dynamic responsive breakpoint configuration
+* Navigation control will show up dynamically for larger screen
+* Touch screen friendly
+* Minimal config setup
+* Tested on chrome, edge and safari
 
-* Lightweight, no dependencies
-* Navigation, pager and arrows
-* Swipe and Mouse support, with velocity detection
-* Works only with JSX syntax currently
+## Options
+```js
+const options = {
+    item: {
+        // css class to inject into each individual item
+        class: '',
+        // padding between each item
+        padding: 12
+    },
+    list: {
+        // css class for the parent of item
+        class: '',
+        // maximum width of the list it can extend to before switching to windowed mode, basically think of the bootstrap container max-width
+        // windowed is used to toggle between full-screen mode and container mode
+        windowed: 1200,
+        // padding of the list, if container < windowed what is the left-right padding of the list
+        // during full-screen mode the padding will added to left & right to centralise the item
+        padding: 24
+    },
+    responsive: [
+        // responsive breakpoints to calculate how many items to show in the list at each width interval
+        // it will always fall back to these: 
+        {end: 576, size: 1},
+        {start: 576, end: 768, size: 2},
+        {start: 768, end: 992, size: 3},
+        {start: 992, end: 1200, size: 4},
+        {start: 1200, size: 5}
+    ],
+    navigation: {
+        // when to show navigation
+        start: 992,
+        color: '#000'
+    },
+    position: {
+        // Start from '1' on mounted.
+        start: 1,
+    },
+    autoplay: {
+        // enable/disable playing slideshow
+        play: true,
+        // the delay duration between slides in milliseconds
+        speed: 1800,
+        // if setup, the slideshow will be in the loop.
+        repeat: true,
+    },
+} 
+```
 
-## Usage
+## Examples
 
-```jsx
-import 'node_modules/vue-simple-slider/dist/Slider.css'
-import Slider from 'vue-simple-slider'
+### Basic Responsive Usage
+- Width between 0 - 576, show 1
+- Width between 576 - 768, show 2
+- Width catch all, show 3
 
-const style = {
-  height: '250px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  color: '#fafafa'
+```vue
+<vue-simple-slider :items="items" :options="{responsive: [{end: 576, size: 1}, {start: 576, end: 768, size: 2},{size: 3}]}">
+<template v-slot:default="{item}">
+  <div class="item">
+    <h5>{{item.title}}</h5>
+    <p>{{item.content}}</p>
+  </div>
+</template>
+</vue-simple-slider>
+```
+
+### Full Example
+```vue
+<template>
+  <div id="app">
+    <section>
+      <vue-simple-slider :items="items" :options="options">
+        <template v-slot:default="{item}">
+          <div class="item">
+            <h5>{{item.title}}</h5>
+            <p>{{item.content}}</p>
+          </div>
+        </template>
+      </vue-simple-slider>
+    </section>
+  </div>
+</template>
+
+<script>
+import Vue from 'vue';
+import VueSimpleSlider from '@/vue-simple-slider.vue';
+
+export default Vue.extend({
+  name: 'ServeDev',
+  components: {
+    VueHorizontalListAuto
+  },
+  data() {
+    return {
+      options: {
+        responsive: [
+          {end: 576, size: 1},
+          {start: 576, end: 768, size: 2},
+          {start: 768, end: 992, size: 3},
+          {size: 4}
+        ],
+        list: {
+          // 1200 because @media (min-width: 1200px) and therefore I want to switch to windowed mode
+          windowed: 1200,
+
+          // Because: #app {padding: 80px 24px;}
+          padding: 24
+        }
+      },
+      items: [
+        {title: 'Item 0', content: 'Content item with description'},
+      ]
+    }
+  }
+});
+</script>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
 }
 
-export default {
-  components: {
-    Slider
-  },
-  render(h) {
-    return (
-      <Slider>
-        <div style={{ background: '#21BB9A', ...style }}>
-          <h1>A</h1>
-        </div>
-        <div style={{ background: '#329ADD', ...style }}>
-          <h1>B</h1>
-        </div>
-        <div style={{ background: '#9A5CB9', ...style }}>
-          <h1>C</h1>
-        </div>
-        <div style={{ background: '#E64C3C', ...style }}>
-          <h1>D</h1>
-        </div>
-        <div style={{ background: '#2D3F52', ...style }}>
-          <h1>E</h1>
-        </div>
-      </Slider>
-    )
+#app {
+  max-width: 1400px;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  padding: 80px 24px;
+}
+
+@media (min-width: 1200px) {
+  #app {
+    padding-left: 80px;
+    padding-right: 80px;
   }
 }
+</style>
 ```
 
-## Screenshot
-![screen shot 2017-06-13 at 2 43 31 am](https://user-images.githubusercontent.com/693487/27049909-5bc66f02-4fe3-11e7-8342-8d3da37a3915.png)
-
-## Build Setup
-
-``` bash
-# install dependencies
-npm i -g vue-cli
-npm install
-
-# serve with hot reload at localhost:4000
-npm run dev
-
-# build for production with minification
-npm run build
-```
-
-For detailed explanation on how things work, consult the [docs for vue-build](https://github.com/vuejs/vue-cli/blob/master/docs/build.md).
-
-
-## License
-vue-simple-slider is open source and released under the [MIT License](LICENSE).
-
-Copyright (c) 2017 [Piyush Chauhan](https://twitter.com/piyushpsycho).
-
-> *PS: I would love to know if you're using vue-simple-slider. Tweet to me at [@piyushpsycho](https://twitter.com/piyushpsycho)*.
-
-## Credits
-Shamelessy copied from react community [React Simple Slider](https://github.com/Stanko/react-slider)
+## Contributing
+For any question or feature request please feel free to create an [issue](https://github.com/zerotul2015/vue-simple-slider/issues/new) or [pull request](https://github.com/zerotul2015/vue-simple-slider/pulls).
